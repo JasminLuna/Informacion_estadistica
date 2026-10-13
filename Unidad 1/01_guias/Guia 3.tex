@@ -1,0 +1,218 @@
+\documentclass[11pt,a4paper]{article}
+
+% ============================================================================
+% GUIA 3 - ESTADISTICA DESCRIPTIVA - UNIDAD 1
+% Guia practica de muestreo, diseno del estudio y preparacion de datos.
+% ============================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot,es-noquoting]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx,array}
+\usepackage{enumitem}
+\usepackage{ragged2e}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr,lastpage}
+\usepackage{microtype}
+\usepackage{hyperref}
+
+\geometry{top=2cm,bottom=2cm,left=2cm,right=2cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\renewcommand{\arraystretch}{1.18}
+\setlist{leftmargin=*,itemsep=2pt,topsep=3pt}
+
+\definecolor{unlgreen}{RGB}{0,91,65}
+\definecolor{azulOscuro}{RGB}{12,43,92}
+\definecolor{azulMedio}{RGB}{30,80,140}
+\definecolor{acentoDorado}{RGB}{197,143,39}
+\definecolor{grisFondo}{RGB}{247,249,252}
+\definecolor{grisTexto}{RGB}{55,65,75}
+\hypersetup{colorlinks=true,linkcolor=azulOscuro,urlcolor=azulMedio}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{22pt}
+\renewcommand{\headrulewidth}{0.7pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{unlgreen}\leaders\hrule height \headrulewidth\hfill}}
+\fancyhead[L]{\small\textbf{UNIVERSIDAD NACIONAL DE LOJA} $\vert$ FARNR}
+\fancyhead[R]{\small Estadística Descriptiva $\vert$ Guía 3}
+\fancyfoot[L]{\footnotesize Carrera de Ingeniería Ambiental $\vert$ Guillermo Chuncho}
+\fancyfoot[R]{\footnotesize Pág. \thepage\ de \pageref{LastPage}}
+
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newtcolorbox{bannerbox}{colback=azulOscuro,colframe=azulOscuro,arc=3pt,boxrule=1pt,
+  top=7pt,bottom=7pt,left=9pt,right=9pt,breakable}
+\newtcolorbox{objetivobox}[1]{colback=green!3!white,colframe=unlgreen,arc=3pt,boxrule=1pt,
+  title=\textbf{#1},fonttitle=\bfseries\color{white},colbacktitle=unlgreen,
+  top=5pt,bottom=5pt,left=8pt,right=8pt,breakable}
+\newtcolorbox{casobox}[1]{colback=grisFondo,colframe=azulOscuro,arc=3pt,boxrule=1pt,
+  title=\textbf{#1},fonttitle=\bfseries\color{white},colbacktitle=azulOscuro,
+  top=5pt,bottom=5pt,left=8pt,right=8pt,breakable}
+\newtcolorbox{alertbox}{colback=acentoDorado!8,colframe=acentoDorado,arc=3pt,boxrule=1pt,
+  top=5pt,bottom=5pt,left=8pt,right=8pt,breakable}
+\newcommand{\respuesta}[1][1]{\par\vspace{2pt}\foreach \i in {1,...,#1}{\noindent\rule{\linewidth}{0.35pt}\par\vspace{5pt}}}
+
+\begin{document}
+
+\begin{bannerbox}
+\centering
+{\large\bfseries\color{white} UNIVERSIDAD NACIONAL DE LOJA}\\[2pt]
+{\small\bfseries\color{white} FACULTAD AGROPECUARIA Y DE RECURSOS NATURALES RENOVABLES}\\[2pt]
+{\footnotesize\color{white} CARRERA DE INGENIERÍA AMBIENTAL $\cdot$ ESTADÍSTICA DESCRIPTIVA}\\[4pt]
+\rule{\linewidth}{0.5pt}\\[4pt]
+{\Large\bfseries\color{white} GUÍA PRÁCTICA 3}\\[2pt]
+{\normalsize\bfseries\color{white} TAMAÑO MUESTRAL, DISEÑO DEL ESTUDIO Y PREPARACIÓN DE DATOS}\\[3pt]
+{\footnotesize\color{white} Unidad 1 $\cdot$ Ciclo 2026--2027}
+\end{bannerbox}
+
+\vspace{0.15cm}
+\begin{casobox}{Ficha de identificación}
+\small
+\begin{tabularx}{\linewidth}{L{2.4cm}Y L{1.8cm}Y}
+\textbf{Estudiante:} & \hrulefill & \textbf{Fecha:} & \hrulefill \\
+\textbf{Paralelo:} & \hrulefill & \textbf{Calificación:} & \textbf{\dots\dots / 10} \\
+\end{tabularx}
+\end{casobox}
+
+\begin{objetivobox}{Propósito y alcance}
+Al finalizar, el estudiante justificará el tamaño de una muestra para estimar una media y una proporción; interpretará valores críticos $Z$ y niveles de confianza; distinguirá diseños observacional, experimental y cuasi-experimental; reconocerá las unidades de análisis y observación; y preparará datos con controles básicos de calidad.
+
+Trabaje con \texttt{Base\_datos\_Guia\_3\_calidad\_agua.xlsx}. Puede ejecutar el análisis completo con \texttt{Guia\_3\_analisis\_muestreo\_ambiental.R} en R o con \texttt{Guia\_3\_analisis\_muestreo\_ambiental.ipynb} en Google Colab. El análisis incluye estimación e intervalos de confianza, comparaciones exploratorias, asociaciones entre variables y controles de calidad.
+\end{objetivobox}
+
+\begin{casobox}{Problema ambiental: nitratos en una microcuenca de Loja}
+Un equipo técnico necesita describir la concentración de nitratos en puntos de monitoreo de una microcuenca. El marco didáctico contiene $N=120$ puntos únicos distribuidos en una campaña de campo. Para practicar el análisis, se marcó una muestra aleatoria simple de $n=35$ puntos. En cada punto se registran nitratos, pH, turbidez, conductividad, temperatura, precipitación antecedente, uso de suelo, zona, subcuenca y fecha.
+
+La pregunta de trabajo es: \emph{¿cuál es la concentración media de nitratos y qué proporción de los puntos supera el umbral operativo definido para este ejercicio?} El indicador binario usa $7.5$ mg/L como umbral didáctico para construir la variable \texttt{alerta\_nitratos}; \textbf{no es una afirmación de cumplimiento o incumplimiento normativo}. Todos los registros son sintéticos y no describen un monitoreo real.
+\end{casobox}
+
+\section*{1. Planificación del estudio y selección del tamaño muestral}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item Complete la ficha metodológica del problema. Distinga el marco disponible de la muestra efectivamente marcada en el Excel.
+\end{enumerate}
+\small
+\begin{tabularx}{\linewidth}{L{4.0cm}Y}
+\toprule
+\textbf{Elemento} & \textbf{Respuesta aplicada al caso} \\
+\midrule
+Población objetivo y periodo & \\
+Marco muestral y tamaño $N$ & \\
+Tamaño de muestra $n$ & \\
+Variable para estimar una media y unidad & \\
+Variable para estimar una proporción y definición del indicador & \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\begin{enumerate}[label=\textbf{\arabic*.},resume]
+\item El tamaño depende del nivel de confianza, el error máximo tolerado, la variabilidad, el tamaño de una población finita y los recursos disponibles. Explique qué cambio espera en $n$ si aumenta la confianza, disminuye $e$ o aumenta $\sigma$.
+\respuesta[2]
+\item Para la media de nitratos, use $N=120$, $Z=1.96$ (95\% de confianza), una desviación piloto $\sigma=3.5$ mg/L y error máximo $e=1$ mg/L. Calcule el tamaño para población grande y para población finita; muestre sustitución, resultado y redondeo hacia arriba.
+\end{enumerate}
+\[
+n_{\infty}=\frac{Z^2\sigma^2}{e^2},
+\qquad
+n_{N}=\frac{NZ^2\sigma^2}{(N-1)e^2+Z^2\sigma^2}.
+\]
+\respuesta[3]
+\begin{alertbox}
+La fórmula con corrección por población finita obtiene aproximadamente 34 unidades; para el ejercicio se trabaja con $n=35$. Compruebe que ese es el tamaño marcado en \texttt{seleccion\_muestra}; el tamaño práctico debe justificarse, no elegirse al azar.
+\end{alertbox}
+
+\begin{enumerate}[label=\textbf{\arabic*.},resume]
+\item Para planificar la proporción de puntos con alerta, use $e=0.10$ y 95\% de confianza. Calcule $q=1-p$ y el tamaño finito para (a) un valor previo $p=0.30$ y (b) ausencia de información previa, $p=0.50$. Compare los resultados y explique por qué el segundo caso es conservador.
+\end{enumerate}
+\[
+n_{N}=\frac{NZ^2pq}{e^2(N-1)+Z^2pq},
+\qquad q=1-p.
+\]
+\respuesta[3]
+
+\begin{enumerate}[label=\textbf{\arabic*.},resume]
+\item Complete la tabla de valores críticos. ¿Qué área central representa el intervalo $[-Z,Z]$ en cada caso? ¿Por qué al aumentar la confianza suele aumentar el tamaño requerido?
+\end{enumerate}
+\small
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+Confianza & $Z$ & Área central entre $-Z$ y $+Z$ \\
+\midrule
+90\% & 1.645 & \\
+95\% & 1.960 & \\
+97\% & 2.170 & \\
+98\% & 2.330 & \\
+99\% & 2.576 & \\
+\bottomrule
+\end{tabular}
+\end{center}
+\normalsize
+\respuesta[2]
+
+\section*{2. Decisión sobre el diseño del estudio}
+\begin{enumerate}[label=\textbf{\arabic*.},resume]
+\item Clasifique cada escenario como observacional, experimental o cuasi-experimental y justifique según exista manipulación y asignación de tratamientos.
+\end{enumerate}
+\small
+\begin{tabularx}{\linewidth}{L{7.0cm}L{3.3cm}Y}
+\toprule
+\textbf{Escenario} & \textbf{Tipo de estudio} & \textbf{Justificación} \\
+\midrule
+Medir nitratos en puntos de agua y describir diferencias por uso de suelo, sin intervenir. & & \\
+Asignar aleatoriamente tres tratamientos de remoción a muestras de agua en laboratorio. & & \\
+Comparar calidad del agua antes y después de una intervención ya implementada, sin asignación aleatoria. & & \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\begin{enumerate}[label=\textbf{\arabic*.},resume]
+\item ¿Cuál es el diseño del caso de esta guía? Redacte una conclusión que el diseño permite sostener y una afirmación causal que no sería válida.
+\respuesta[2]
+\end{enumerate}
+
+\section*{3. Unidades y pseudorreplicación}
+En el archivo, cada fila representa un punto de monitoreo único. La muestra de agua se analiza en laboratorio y puede producir varias lecturas técnicas.
+\begin{enumerate}[label=\textbf{\arabic*.},resume]
+\item Identifique para este estudio: unidad muestral, unidad de análisis y unidad de observación. Explique por qué una lectura repetida del mismo punto no equivale a seleccionar otro punto.
+\respuesta[2]
+\item Si se toman tres lecturas técnicas en cada uno de los 35 puntos, ¿cuántos registros de lectura habría y cuántas unidades de análisis independientes? Describa el error de tratarlos como 105 puntos independientes.
+\respuesta[2]
+\end{enumerate}
+
+\section*{4. Preparación y control de calidad de la base}
+Antes de analizar, use el diccionario de variables de la hoja \texttt{Diccionario} y ejecute las verificaciones del script. La secuencia mínima es: captura y registro; codificación consistente; revisión de duplicados e intervalos físicamente posibles; identificación explícita de faltantes; revisión de valores atípicos sin borrado automático; y control de calibración y trazabilidad.
+
+\begin{enumerate}[label=\textbf{\arabic*.},resume]
+\item Abra \texttt{Datos} y describa una fila: ¿qué representa?, ¿qué identifica \texttt{id\_punto}? Verifique que el marco tenga 120 IDs únicos y que la muestra contenga 35 puntos.
+\item El script identifica un dato faltante de conductividad. Anote la variable y el registro; proponga cómo verificarlo y explique por qué no corresponde inventar un valor.
+\respuesta[2]
+\item Revise los controles de pH, nitratos no positivos y valores atípicos de turbidez. Si el script no encuentra casos, indique por qué eso no demuestra por sí solo que toda medición sea correcta. ¿Qué verificación de campo o laboratorio reforzaría la calidad de los datos?
+\respuesta[2]
+\item Compare la media de nitratos y la proporción de alertas calculadas con la muestra con los valores del marco sintético. Reporte $\bar{x}$, $s$, $\hat p$ y explique por qué son estadísticos muestrales, mientras que los valores calculados sobre los 120 registros son parámetros conocidos solo porque este marco didáctico está completo.
+\respuesta[3]
+\end{enumerate}
+
+\section*{5. Ejecución guiada en R y reporte}
+Ejecute \texttt{Guia\_3\_analisis\_muestreo\_ambiental.R} desde la carpeta de los archivos. El script está organizado para seguir el problema sin cambiar de base:
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item Importa la hoja \texttt{Datos} y comprueba las variables necesarias.
+\item Resume población, marco, muestra y unidades del estudio.
+\item Calcula tamaños para media y proporción, contrasta valores de $p$ y grafica la normal estándar con $Z=\pm1.96$.
+\item Calcula intervalos de confianza para media y proporción, con corrección por población finita.
+\item Resume nitratos por zona y uso de suelo, explora asociaciones con lluvia, altitud y turbidez, y compara los estadísticos muestrales con el marco sintético.
+\item Genera gráficos exploratorios y revisa IDs, faltantes, rangos y valores atípicos sin eliminarlos automáticamente.
+\end{enumerate}
+
+\begin{casobox}{Producto de la práctica}
+Entregue una ficha breve que incluya: (1) pregunta ambiental y diseño elegido; (2) justificación de los tamaños para media y proporción; (3) identificación de población, marco, muestra y unidades; (4) resultados muestrales interpretados en sus unidades; y (5) decisiones de control de calidad con una limitación del estudio. Mantenga explícito que el conjunto de datos es sintético y que el umbral de alerta es solo didáctico.
+\end{casobox}
+
+\begin{alertbox}
+\textbf{Criterio de interpretación:} un cálculo correcto no sustituye la revisión del diseño ni la calidad de la medición. No generalice más allá de la población y el periodo definidos, no presente asociación como causalidad y no convierta el umbral didáctico en una norma ambiental.
+\end{alertbox}
+
+\end{document}
